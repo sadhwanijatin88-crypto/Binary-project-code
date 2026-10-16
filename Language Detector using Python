@@ -1,0 +1,211 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyO1jVv7h9pFxq6FmiK5QDRV",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sadhwanijatin88-crypto/Binary-project-code/blob/main/Language%20Detector%20using%20Python\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "5_InL27i2W54",
+        "outputId": "c511b584-a0d1-4bab-c2f3-e8696654ef34"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting langdetect\n",
+            "  Downloading langdetect-1.0.9.tar.gz (981 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m981.5/981.5 kB\u001b[0m \u001b[31m16.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25h  Preparing metadata (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "Requirement already satisfied: six in /usr/local/lib/python3.13/dist-packages (from langdetect) (1.17.0)\n",
+            "Building wheels for collected packages: langdetect\n",
+            "  Building wheel for langdetect (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Created wheel for langdetect: filename=langdetect-1.0.9-py3-none-any.whl size=993335 sha256=32ae81cdf24eaead294198080822ef9d297cf96c1648b010bb1dd25d3a9e7211\n",
+            "  Stored in directory: /root/.cache/pip/wheels/eb/87/25/2dddf1c94e1786054e25022ec5530bfed52bad86d882999c48\n",
+            "Successfully built langdetect\n",
+            "Installing collected packages: langdetect\n",
+            "Successfully installed langdetect-1.0.9\n"
+          ]
+        }
+      ],
+      "source": [
+        "pip install langdetect"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from langdetect import DetectorFactory, detect, detect_langs\n",
+        "from langdetect.lang_detect_exception import LangDetectException\n",
+        "\n",
+        "# Enforce deterministic results (seeds the detector)\n",
+        "DetectorFactory.seed = 0\n",
+        "\n",
+        "# Common ISO 639-1 language code mapping\n",
+        "LANGUAGE_NAMES = {\n",
+        "    \"en\": \"English\",\n",
+        "    \"es\": \"Spanish\",\n",
+        "    \"fr\": \"French\",\n",
+        "    \"de\": \"German\",\n",
+        "    \"it\": \"Italian\",\n",
+        "    \"pt\": \"Portuguese\",\n",
+        "    \"nl\": \"Dutch\",\n",
+        "    \"ru\": \"Russian\",\n",
+        "    \"zh-cn\": \"Chinese (Simplified)\",\n",
+        "    \"zh-tw\": \"Chinese (Traditional)\",\n",
+        "    \"ja\": \"Japanese\",\n",
+        "    \"ko\": \"Korean\",\n",
+        "    \"ar\": \"Arabic\",\n",
+        "    \"hi\": \"Hindi\",\n",
+        "    \"bn\": \"Bengali\",\n",
+        "    \"tr\": \"Turkish\",\n",
+        "}\n",
+        "\n",
+        "\n",
+        "def identify_language(text: str) -> None:\n",
+        "    text = text.strip()\n",
+        "    if not text:\n",
+        "        print(\"Please enter valid text.\")\n",
+        "        return\n",
+        "\n",
+        "    try:\n",
+        "        # Detect primary language code\n",
+        "        primary_code = detect(text)\n",
+        "        primary_name = LANGUAGE_NAMES.get(primary_code, primary_code.upper())\n",
+        "\n",
+        "        # Retrieve confidence probabilities\n",
+        "        probabilities = detect_langs(text)\n",
+        "\n",
+        "        print(\"-\" * 40)\n",
+        "        print(f\"Input Text: \\\"{text}\\\"\")\n",
+        "        print(f\"Detected Language: {primary_name} ({primary_code})\")\n",
+        "        print(\"Confidence Breakdown:\")\n",
+        "        for pred in probabilities:\n",
+        "            name = LANGUAGE_NAMES.get(pred.lang, pred.lang.upper())\n",
+        "            print(f\"  • {name}: {pred.prob * 100:.2f}%\")\n",
+        "        print(\"-\" * 40)\n",
+        "\n",
+        "    except LangDetectException:\n",
+        "        print(\"Could not detect any recognizable language features.\")\n",
+        "\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "    samples = [\n",
+        "        \"Artificial intelligence is transforming software engineering.\",\n",
+        "        \"Bonjour tout le monde, comment allez-vous aujourd'hui?\",\n",
+        "        \"Guten Tag! Wie geht es Ihnen?\",\n",
+        "        \"नमस्ते, आप कैसे हैं?\",\n",
+        "        \"El aprendizaje automático es una rama de la inteligencia artificial.\",\n",
+        "    ]\n",
+        "\n",
+        "    print(\"Running test samples:\\n\")\n",
+        "    for sample in samples:\n",
+        "        identify_language(sample)\n",
+        "\n",
+        "    # Interactive Loop\n",
+        "    print(\"\\nInteractive Mode (type 'exit' to quit):\")\n",
+        "    while True:\n",
+        "        user_input = input(\"\\nEnter text: \")\n",
+        "        if user_input.lower() == \"exit\":\n",
+        "            break\n",
+        "        identify_language(user_input)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xVF49E6o2lEs",
+        "outputId": "5eb85204-bd8a-44e2-8123-e20c08ffecb2"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Running test samples:\n",
+            "\n",
+            "----------------------------------------\n",
+            "Input Text: \"Artificial intelligence is transforming software engineering.\"\n",
+            "Detected Language: English (en)\n",
+            "Confidence Breakdown:\n",
+            "  • English: 100.00%\n",
+            "----------------------------------------\n",
+            "----------------------------------------\n",
+            "Input Text: \"Bonjour tout le monde, comment allez-vous aujourd'hui?\"\n",
+            "Detected Language: French (fr)\n",
+            "Confidence Breakdown:\n",
+            "  • French: 100.00%\n",
+            "----------------------------------------\n",
+            "----------------------------------------\n",
+            "Input Text: \"Guten Tag! Wie geht es Ihnen?\"\n",
+            "Detected Language: German (de)\n",
+            "Confidence Breakdown:\n",
+            "  • German: 100.00%\n",
+            "----------------------------------------\n",
+            "----------------------------------------\n",
+            "Input Text: \"नमस्ते, आप कैसे हैं?\"\n",
+            "Detected Language: Hindi (hi)\n",
+            "Confidence Breakdown:\n",
+            "  • Hindi: 100.00%\n",
+            "----------------------------------------\n",
+            "----------------------------------------\n",
+            "Input Text: \"El aprendizaje automático es una rama de la inteligencia artificial.\"\n",
+            "Detected Language: Spanish (es)\n",
+            "Confidence Breakdown:\n",
+            "  • Spanish: 100.00%\n",
+            "----------------------------------------\n",
+            "\n",
+            "Interactive Mode (type 'exit' to quit):\n",
+            "\n",
+            "Enter text: bye\n",
+            "----------------------------------------\n",
+            "Input Text: \"bye\"\n",
+            "Detected Language: NO (no)\n",
+            "Confidence Breakdown:\n",
+            "  • NO: 100.00%\n",
+            "----------------------------------------\n",
+            "\n",
+            "Enter text: Hola\n",
+            "----------------------------------------\n",
+            "Input Text: \"Hola\"\n",
+            "Detected Language: Turkish (tr)\n",
+            "Confidence Breakdown:\n",
+            "  • Turkish: 100.00%\n",
+            "----------------------------------------\n",
+            "\n",
+            "Enter text: exit\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
